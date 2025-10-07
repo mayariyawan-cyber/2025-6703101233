@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Outside Dish – Responsive (Left Scatter)</title>
+<style>
+:root{
+  --pad-x: 62px;
+  --pad-y: 52px;
+  --bg: #ffffff;
+  --canvas: #ffffff;
+  --ink: #222;
+  --muted: #6f7a86;
+  --item-scale: 1;
+  --item-gap: 8px;
+  --left-bias: 0.70;
+  --scatter-safe: 24px;
+  --left-gutter: 60px;
+  --topbar-offset: 60px;
+  --downbar-offset: 40px;
+  --right-mid-w: clamp(500px, 28%, 640px);
+  --right-bottom-w: clamp(600px, 26%, 720px);
+}
+
+html,body{
+  margin:0;
+  height:100%;
+  background:var(--bg);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  color:var(--ink);
+}
+
+.stage-wrap{
+  min-height:100%;
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
+.stage{
+  position:relative;
+  width:clamp(320px, 90vw, 1680px);
+  height:clamp(420px, 90vh, 1080px);
+  background:var(--canvas);
+  box-shadow:0 2px 20px rgba(0,0,0,.08);
+  overflow:hidden;
+  padding:var(--pad-y) var(--pad-x);
+}
+
+.topbar{
+  position:absolute;
+  left:var(--pad-x);
+  top:var(--pad-y);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  z-index:10;
+}
+.btn{
+  width:40px;
+  height:40px;
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center;
+  cursor:pointer;
+  display:block;
+  transition:transform .15s ease, filter .15s ease;
+}
+.btn:hover{ transform:translateY(-3px) scale(.8); filter:brightness(.8); }
+.btn:active{ transform:translateY(1px) scale(.97); filter:brightness(.9); }
+.btn[data-btn="main"]{ background-image:url("images/btn-main.png"); }
+.btn[data-btn="1"]{ background-image:url("images/btn-1.png"); }
+.btn[data-btn="2"]{ background-image:url("images/btn-2.png"); }
+.btn[data-btn="3"]{ background-image:url("images/btn-3.png"); }
+.btn[data-btn="4"]{ background-image:url("images/btn-4.png"); }
+.btn[data-btn="main"]:hover{ background-image:url("images/btn-main-active.png"); }
+.btn[data-btn="1"]:hover{ background-image:url("images/btn-1-active.png"); }
+.btn[data-btn="2"]:hover{ background-image:url("images/btn-2-active.png"); }
+.btn[data-btn="3"]:hover{ background-image:url("images/btn-3-active.png"); }
+.btn[data-btn="4"]:hover{ background-image:url("images/btn-4-active.png"); }
+
+.scatter{
+  position:absolute;
+  pointer-events:none;
+}
+.item{
+  position:absolute;
+  transform:translate(var(--x,3px), var(--y,3px)) rotate(var(--r,60deg)) scale(calc(var(--item-scale) * var(--p,1) * var(--rand,1)));
+  transition:transform .5s cubic-bezier(.2,.8,.2,1), filter .3s ease;
+  pointer-events:auto;
+  max-width:clamp(70px, 11vw, 200px);
+  will-change:transform;
+}
+.item:hover{
+  transform:translate(var(--x,0px), var(--y,0px)) rotate(calc(var(--r,0deg) + 1deg)) scale(calc(var(--s, var(--item-scale)) * 1.04));
+  filter:brightness(1.02);
+}
+
+.right-col{
+  position:absolute;
+  right:var(--pad-x);
+  top:calc(var(--pad-y) + 100px);
+  bottom:var(--pad-y);
+  width:min(48%,640px);
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  text-align:right;
+}
+.brand-img{ max-width:100%; height:auto; }
+.right-mid{
+  width:var(--right-mid-w);
+  height:auto;
+  margin-top:40px;
+  margin-right:20px;
+}
+.right-bottom{
+  position:absolute;
+  right:0;
+  bottom:0;
+  width:var(--right-bottom-w);
+  height:auto;
+  margin:0;
+}
+
+@media (max-width:1280px){
+  :root{
+    --item-gap:8px;
+    --right-mid-w:clamp(180px,32vw,300px);
+    --right-bottom-w:clamp(180px,30vw,280px);
+  }
+}
+@media (max-width:1024px){
+  :root{
+    --pad-x:32px;
+    --pad-y:36px;
+    --right-mid-w:clamp(170px,40vw,280px);
+    --right-bottom-w:clamp(170px,38vw,260px);
+  }
+  .btn{ width:34px; height:34px; }
+}
+@media (max-width:768px){
+  :root{
+    --pad-x:24px;
+    --pad-y:28px;
+    --left-bias:2.5;
+    --right-mid-w:clamp(160px,62vw,260px);
+    --right-bottom-w:clamp(160px,58vw,240px);
+  }
+  .right-col{
+    right:var(--pad-x);
+    top:calc(var(--pad-y) + 64px);
+    bottom:var(--pad-y);
+    width:min(86%,560px);
+    align-items:flex-end;
+    text-align:right;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  *{ transition:none!important; animation:none!important; }
+}
+
+#scatter .item:hover{
+  transform:translate(var(--x,0px), var(--y,0px)) rotate(var(--r,0deg)) scale(calc(var(--item-scale) * var(--p,1) * var(--rand,1)))!important;
+  filter:none!important;
+}
+</style>
+</head>
+<body>
+<div class="stage-wrap">
+  <div class="stage">
+    <div class="frame"></div>
+
+    <div class="topbar">
+      <a class="btn" data-btn="main" href="index.html" aria-label="main"></a>
+      <a class="btn" data-btn="1" href="page1.html" aria-label="1"></a>
+      <a class="btn" data-btn="2" href="page2.html" aria-label="2"></a>
+      <a class="btn" data-btn="3" href="page3.html" aria-label="3"></a>
+      <a class="btn" data-btn="4" href="page4.html" aria-label="4"></a>
+    </div>
+
+    <div class="scatter" id="scatter">
+      <img class="item" src="images/monkey.png"    data-scale="2"   alt="">
+      <img class="item" src="images/chopstick.png" data-scale="0.5" alt="">
+      <img class="item" src="images/wipcream.png"  data-scale="0.7" alt="">
+      <img class="item" src="images/creamsoda.png" data-scale="0.8" alt="">
+      <img class="item" src="images/cookie.png"    data-scale="0.8" alt="">
+      <img class="item" src="images/Grape.png"     data-scale="0.7" alt="">
+      <img class="item" src="images/egg1.png"      data-scale="0.5" alt="">
+      <img class="item" src="images/egg2.png"      data-scale="0.5" alt="">
+    </div>
+
+    <div class="right-col">
+      <img class="brand-img right-mid"    src="images/decor-right.png"  alt="Rethinking about food waste">
+      <img class="brand-img right-bottom" src="images/decor-bottom.png" alt="Outside">
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const stage=document.querySelector('.stage');
+  const scatter=document.getElementById('scatter');
+  const right=document.querySelector('.right-col');
+  if(!stage||!scatter) return;
+
+  const rootNum=(name)=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name))||0;
+  const clampMaxWidth=()=>{
+    const vw=Math.max(window.innerWidth,360);
+    return Math.min(160,Math.max(70,0.11*vw));
+  };
+  const baseItemScale=()=>rootNum('--item-scale')||1;
+  const perItemScale=(el)=>{ const v=parseFloat(el.dataset.scale); return Number.isFinite(v)?v:1; };
+
+  function imgDims(el){
+    const naturalW=el.naturalWidth||160;
+    const naturalH=el.naturalHeight||160;
+    const maxWpx=clampMaxWidth();
+    const sMain=baseItemScale()*perItemScale(el);
+    const w0=Math.min(naturalW,maxWpx);
+    const h0=(naturalH/Math.max(naturalW,1))*w0;
+    return { w:w0*sMain, h:h0*sMain, sMain };
+  }
+
+  function intersectsAny(a,arr,gap){
+    const ax1=a.x-gap, ay1=a.y-gap, ax2=a.x+a.w+gap, ay2=a.y+a.h+gap;
+    for(const b of arr){
+      const bx1=b.x-gap, by1=b.y-gap, bx2=b.x+b.w+gap, by2=b.y+b.h+gap;
+      if(!(ax2<bx1||bx2<ax1||ay2<by1||by2<ay1)) return true;
+    }
+    return false;
+  }
+
+  function computeScatterBox(){
+    const st=stage.getBoundingClientRect();
+    const padX=rootNum('--pad-x');
+    const padY=rootNum('--pad-y');
+    const gutterRight=24;
+
+    const leftEdge=padX+50;
+    const topEdge=padY+50;
+
+    const stageRightLimit=st.width-padX;
+    let rightLimit=stageRightLimit;
+    if(right){
+      const rc=right.getBoundingClientRect();
+      const rcLeftRelToStage=(rc.left-st.left);
+      rightLimit=Math.min(stageRightLimit, rcLeftRelToStage-gutterRight);
+    }
+
+    const width=Math.max(200, rightLimit-leftEdge);
+    const bottomEdge=st.height-padY;
+    const height=Math.max(220, bottomEdge-topEdge);
+
+    scatter.style.position='absolute';
+    scatter.style.left=leftEdge+'px';
+    scatter.style.top=topEdge+'px';
+    scatter.style.width=width+'px';
+    scatter.style.height=height+'px';
+
+    return { W:width, H:height };
+  }
+
+  function placeItems(){
+    const items=Array.from(scatter.querySelectorAll('.item'));
+    const gap=rootNum('--item-gap')||20;
+    const bias=rootNum('--left-bias')||0.1;
+
+    const { W,H }=computeScatterBox();
+    const placed=[];
+    const withSize=items.map(el=>({ el, ...imgDims(el) })).sort((a,b)=>(b.w*b.h)-(a.w*a.h));
+
+    withSize.forEach(({el,w,h,sMain})=>{
+      const maxTry=280;
+      let x=gap, y=gap, ok=false;
+
+      for(let t=0;t<maxTry && !ok;t++){
+        const rx=Math.random()**2;
+        const usableW=Math.max(0, W-w-gap*2);
+        const usableH=Math.max(0, H-h-gap*2);
+
+        x=(rx*bias)*usableW+gap;
+        y=Math.random()*usableH+gap;
+
+        const rect={x,y,w,h};
+        if(!intersectsAny(rect,placed,gap)){ placed.push(rect); ok=true; }
+      }
+
+      const rand=0.96+Math.random()*0.08;
+      el.style.setProperty('--x',`${x}px`);
+      el.style.setProperty('--y',`${y}px`);
+      el.style.setProperty('--r',`${((Math.random()-0.5)*6).toFixed(2)}deg`);
+      el.style.setProperty('--p',String(perItemScale(el)));
+      el.style.setProperty('--rand',`${rand.toFixed(3)}`);
+      el.style.setProperty('--s',`${(sMain*rand).toFixed(4)}`);
+    });
+  }
+
+  function setupHover(){
+    const items=Array.from(scatter.querySelectorAll('.item'));
+    scatter.addEventListener('mouseenter',()=>{
+      const { W,H }=computeScatterBox();
+      const gap=rootNum('--item-gap')||8;
+      const amp=5;
+
+      items.forEach(el=>{
+        const ox=parseFloat(getComputedStyle(el).getPropertyValue('--x'))||0;
+        const oy=parseFloat(getComputedStyle(el).getPropertyValue('--y'))||0;
+        const { w,h }=imgDims(el);
+
+        let nx=ox+(Math.random()-0.5)*amp*2;
+        let ny=oy+(Math.random()-0.5)*amp*2;
+
+        nx=Math.max(gap, Math.min(nx, Math.max(W-w-gap, gap)));
+        ny=Math.max(gap, Math.min(ny, Math.max(H-h-gap, gap)));
+
+        el.style.setProperty('--x',`${nx}px`);
+        el.style.setProperty('--y',`${ny}px`);
+      });
+    });
+    scatter.addEventListener('mouseleave',()=>relayout());
+  }
+
+  function onImagesReady(imgs,cb){
+    let left=imgs.length;
+    if(left===0) return cb();
+    imgs.forEach(img=>{
+      if(img.complete){ if(--left===0) cb(); }
+      else{
+        img.addEventListener('load',()=>{ if(--left===0) cb(); });
+        img.addEventListener('error',()=>{ if(--left===0) cb(); });
+      }
+    });
+  }
+
+  function relayout(){
+    computeScatterBox();
+    placeItems();
+  }
+
+  const imgs=Array.from(scatter.querySelectorAll('.item'));
+  onImagesReady(imgs,()=>{
+    relayout();
+    setupHover();
+  });
+
+  window.addEventListener('resize',()=>{
+    clearTimeout(window.__relayoutTimer);
+    window.__relayoutTimer=setTimeout(relayout,120);
+  });
+})();
+</script>
+</body>
+</html>
+
